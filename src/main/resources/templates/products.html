@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      th:replace="layout/admin :: layout">
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between mb-3">
+        <form method="get" class="form-inline">
+            <input type="text"
+                   name="keyword"
+                   class="form-control mr-2"
+                   placeholder="Search product">
+            <button class="btn btn-secondary">
+                Search
+            </button>
+        </form>
+
+        <button class="btn btn-primary"
+                sec:authorize="hasRole('ADMIN')"
+                data-toggle="modal"
+                data-target="#addModal">
+            Add Product
+        </button>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Category</th>
+            <th sec:authorize="hasRole('ADMIN')">
+                Action
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${products}">
+            <td th:text="${p.id}"></td>
+            <td th:text="${p.name}"></td>
+            <td th:text="${p.price}"></td>
+            <td th:text="${p.quantity}"></td>
+            <td th:text="${p.category != null ? p.category.name : 'N/A'}"></td>
+            <td sec:authorize="hasRole('ADMIN')">
+                <button class="btn btn-warning btn-sm"
+                        onclick="editProduct(this)"
+                        data-toggle="modal"
+                        data-target="#addModal"
+                        th:data-id="${p.id}"
+                        th:data-name="${p.name}"
+                        th:data-price="${p.price}"
+                        th:data-quantity="${p.quantity}"
+                        th:data-category="${p.category != null ? p.category.id : ''}">
+                    Edit
+                </button>
+                <a class="btn btn-danger btn-sm"
+                   th:href="@{'/products/delete/'+${p.id}}"
+                   onclick="return confirm('Delete this product?')">
+                    Delete
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- POPUP FORM -->
+    <div class="modal fade" id="addModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="modalTitle">Add Product</h5>
+                </div>
+
+                <div class="modal-body">
+                    <form th:action="@{/products/save}" method="post">
+                        <input type="hidden"
+                               id="productId"
+                               name="id">
+                        <input
+                                class="form-control mb-2"
+                                id="productName"
+                                name="name"
+                                placeholder="Product name"
+                                required>
+                        <input class="form-control mb-2"
+                               id="productPrice"
+                               name="price"
+                               type="number"
+                               min="0"
+                               placeholder="Price">
+                        <input class="form-control mb-2"
+                               id="productQuantity"
+                               name="quantity"
+                               type="number"
+                               min="0"
+                               placeholder="Quantity">
+                        <select class="form-control mb-2"
+                                id="productCategory"
+                                name="category.id">
+                            <option value="" disabled selected>Select Category</option>
+                            <option th:each="c : ${categories}"
+                                    th:value="${c.id}"
+                                    th:text="${c.name}">
+                            </option>
+                        </select>
+
+                        <button class="btn btn-dark">
+                            Save
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function editProduct(btn){
+            var b = $(btn);
+
+            var id = b.data('id');
+            var name = b.data('name');
+            var price = b.data('price');
+            var quantity = b.data('quantity');
+            var category = b.data('category');
+
+            $('#modalTitle').text('Edit Product');
+
+            $('#productId').val(id);
+            $('#productName').val(name);
+            $('#productPrice').val(price);
+            $('#productQuantity').val(quantity);
+            $('#productCategory').val(category);
+        }
+
+        $('#addModal').on('show.bs.modal', function(event){
+            var button = $(event.relatedTarget);
+
+            if(!button.data('id')){
+                $('#modalTitle').text('Add Product');
+
+                $('#productId').val('');
+                $('#productName').val('');
+                $('#productPrice').val('');
+                $('#productQuantity').val('');
+                $('#productCategory').val('');
+            }
+        });
+    </script>
+</div>
+</body>
+</html>

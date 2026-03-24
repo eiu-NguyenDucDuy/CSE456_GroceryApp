@@ -1,0 +1,8 @@
+<nav th:fragment="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a th:href="@{/dashboard}">Home</a>
+        </li>
+        <li class="breadcrumb-item active" th:text="${title}">Dashboard</li>
+    </ol>
+</nav>

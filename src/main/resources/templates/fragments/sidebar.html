@@ -1,0 +1,31 @@
+<div class="col-md-2 sidebar" th:fragment="sidebar">
+    <!-- Logo -->
+    <div class="logo"><i class="fas fa-crown"></i> ADMIN</div>
+
+    <!-- Navigation Menu -->
+    <nav class="nav-menu">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${title == 'Dashboard'} ? 'active'"
+                   th:href="@{/dashboard}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${title == 'Category Management'} ? 'active'"
+                   th:href="@{/categories}">
+                    <i class="fas fa-list"></i> Category Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${title == 'Product Management'} ? 'active'"
+                   th:href="@{/products}">
+                    <i class="fas fa-box"></i> Product Management
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>

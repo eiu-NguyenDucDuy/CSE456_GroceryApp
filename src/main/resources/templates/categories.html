@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      th:replace="layout/admin :: layout">
+<body>
+
+<div th:fragment="content">
+    <div class="d-flex justify-content-between mb-3">
+        <form method="get" class="form-inline">
+            <input type="text"
+                   name="keyword"
+                   class="form-control mr-2"
+                   placeholder="Search category">
+            <button class="btn btn-secondary">
+                Search
+            </button>
+        </form>
+
+        <button class="btn btn-primary"
+                sec:authorize="hasRole('ADMIN')"
+                data-toggle="modal"
+                data-target="#addModal">
+            Add Category
+        </button>
+    </div>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th sec:authorize="hasRole('ADMIN')">
+                Action
+            </th>
+        </tr>
+        <tr th:each="c : ${categories}">
+            <td th:text="${c.id}"></td>
+            <td th:text="${c.name}"></td>
+            <td th:text="${c.description}"></td>
+            <td sec:authorize="hasRole('ADMIN')">
+                <button class="btn btn-warning btn-sm"
+                        onclick="editCategory(this)"
+                        data-toggle="modal"
+                        data-target="#addModal"
+                        th:data-id="${c.id}"
+                        th:data-name="${c.name}"
+                        th:data-description="${c.description}">
+                    Edit
+                </button>
+                <a th:href="@{/categories/delete/{id}(id=${c.id})}"
+                   class="btn btn-sm btn-danger"
+                   onclick="return confirm('Delete this category?')">
+                    Delete
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <!-- POPUP FORM -->
+    <div class="modal fade" id="addModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="modalTitle">Add Category</h5>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/categories/save}" method="post">
+                        <input type="hidden"
+                               id="categoryId"
+                               name="id">
+                        <input
+                                class="form-control mb-2"
+                                id="categoryName"
+                                name="name"
+                                placeholder="Category name"
+                                required>
+                        <textarea
+                                class="form-control mb-2"
+                                id="categoryDescription"
+                                name="description"
+                                placeholder="Description">
+                        </textarea>
+
+                        <button class="btn btn-dark">
+                            Save
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function editCategory(btn){
+            var b = $(btn);
+
+            var id = b.data('id');
+            var name = b.data('name');
+            var description = b.data('description');
+
+            $('#modalTitle').text('Edit Category');
+
+            $('#categoryId').val(id);
+            $('#categoryName').val(name);
+            $('#categoryDescription').val(description);
+        }
+
+        $('#addModal').on('show.bs.modal', function(event){
+            var button = $(event.relatedTarget);
+
+            if(!button.data('id')){
+                $('#modalTitle').text('Add Category');
+
+                $('#categoryId').val('');
+                $('#categoryName').val('');
+                $('#categoryDescription').val('');
+            }
+        });
+    </script>
+</div>
+</body>
+</html>
